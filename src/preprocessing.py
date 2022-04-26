@@ -92,9 +92,6 @@ class Preprocessor:
 
         wav_fd.close()
 
-    def addNewFile(self, label_file_path):
-        self.label_file_paths.append(label_file_path)
-
     def preprocessingLabel(self, label_file_path):
         json_data = self.loadJson(label_file_path)
 
