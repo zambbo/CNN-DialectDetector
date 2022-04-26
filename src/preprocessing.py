@@ -5,6 +5,9 @@ import wave
 
 class Preprocessor:
 
+    # label_file_path : the path of the directory include label json files
+    # wav_file_path : the path of the directory include wav files
+    # save_region_dir : the path of the directory you want to save label file and chunked wav files.
     def __init__(self, label_file_path, wav_file_path, save_region_dir):
         self.label_file_path = label_file_path
         self.wav_file_path = wav_file_path
