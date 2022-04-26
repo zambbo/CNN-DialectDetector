@@ -3,6 +3,28 @@ import os
 import pickle
 import wave
 
+# tree of dataset of one region
+# dataset
+# ├── label_dir
+# │   ├── 001.json
+# │   ├── 001.txt
+# │   └── 002.json
+# └── wav_dir
+#     ├── 001.wav
+#     └── 002.wav
+
+# tree of preprocessed dataset
+# preprocessed_dir
+# ├── chungcheong
+# │   └── preprocessed_001
+# │       ├── 001.json
+# │       ├── 1.wav
+# │       ├── 2.wav
+# │       └── 3.wav
+# ├── gangwon
+# ├── gyungsang
+# ├── jeju
+# └── junla
 class Preprocessor:
 
     # label_file_path : the path of the directory include label json files
