@@ -1,4 +1,0 @@
-각각의 chunk는 다음과 같이 구성
-array_001 = np.array([001_chunk1, 001_chunk2, 001_chunk3, ...])
-pickle.dump(array_001, save_file_path)
-
