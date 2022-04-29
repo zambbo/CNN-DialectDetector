@@ -168,6 +168,15 @@ def main():
     if args.spectrogram: modes.append("spectro")
     if args.chromagram: modes.append("chroma")
     
+    # 1. 데이터를 담고있는 전체 디렉토리
+    # 2. 데이터 디렉토리 안의 지역 디렉토리
+    # 3. 지역 디렉토리 안의 레이블 디렉토리(1개만 존재)
+    # 4. 지역 디렉토리 안의 데이터 디렉토리 리스트 ex) ['gangwon_data_1','gangwon_data_2']
+    # 5. 전처리한 데이터가 담길 베이스 디렉토리
+    # 6. Samplerate (보통 16000으로 고정)
+    # 7. drop_start_sec
+    # 8. drop_end_sec
+    # 9. img_save : True면 이미지 저장
     config = Config('../dataset', 'gangwon', 'gangwon_label', ['gangwon_data_1'], './preprocessed_gangwon', 16000, 4, 6, vis)
 
     preprocessor = Preprocessor(config)
