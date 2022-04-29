@@ -92,8 +92,6 @@ class Preprocessor:
             sys.exit(0)
         data = librosa.load(data_path, sr=16000)
         padded_audios = self.audio_preprocess(label_path, data)
-        print("Audio Load Finish")
-        print(f"Audios shape : {padded_audios.shape}")
 
         save_path = os.path.join(self.config.save_region_dir, file_name)
         if not os.path.isdir(save_path): os.mkdir(save_path)
@@ -132,7 +130,6 @@ class Preprocessor:
         if not os.path.isdir(self.config.save_region_dir): os.mkdir(self.config.save_region_dir)
 
         for i, (label_file, data_file) in enumerate(wav_label_dict.items(),1):
-            if i == 3: break
             print(f"\r{i}/{len(wav_label_dict)}", end="")
             data_file_name, data_dir_name = data_file
             label_path = os.path.join(self.config.label_dir, label_file)
