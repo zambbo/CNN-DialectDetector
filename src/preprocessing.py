@@ -81,7 +81,7 @@ class Preprocessor:
 
         audio, sr = data
         splited_audios = [audio[int(start*sr):int(end*sr)] for start, end in time_info]
-        splited_audios = [audio for audio in splited_audios if len(audio) >= 4*sr and len(audio) <= 6*sr]
+        splited_audios = [audio for audio in splited_audios if len(audio) >= self.config.drop_start_sec*self.config.samplerate and len(audio) <= self.config.drop_end_sec*self.config.samplerate]
         splited_audios = [self.resize(audio, self.config.resize) for audio in splited_audios]
         padded_audios = np.vstack(splited_audios)
         return padded_audios
