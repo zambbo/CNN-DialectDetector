@@ -140,14 +140,17 @@ def preprocessing(label_dir, data_dir, label_file, data_file, save_region_dir, a
     if not os.path.isdir(save_path): os.mkdir(save_path)
     if args.chromagram:
         chromas = [preprocessor.chromagram(audio, sr) for audio in padded_audios]
+        chromas = np.stack(len(chromas), axis=0)
         preprocessor.saveChromaFig(chromas[0], os.path.join(save_path, f"{file_name}.png"))
         preprocessor.saveChromaAsPickle(chromas, os.path.join(save_path, f"{file_name}.pickle"))
     if args.spectrogram:
         spectros = [preprocessor.spectrogram(audio, sr) for audio in padded_audios]
+        spectros = np.stack(len(spectros), axis=0)
         preprocessor.saveSpectroFig(spectros[0], os.path.join(save_path, f"{file_name}.png"))
         preprocessor.saveSpectroAsPickle(spectros, os.path.join(save_path, f"{file_name}.pickle"))        
     if args.mfcc:
         mfcc = [preprocessor.mfcc(audio, sr) for audio in padded_audios]
+        mfcc = np.stack(len(mfcc), axis=0)
         preprocessor.saveMFCCFig(mfcc[0], os.path.join(save_path, f"{file_name}.png"))
         preprocessor.saveMFCCAsPickle(mfcc, os.path.join(save_path, f"{file_name}.pickle"))          
 
