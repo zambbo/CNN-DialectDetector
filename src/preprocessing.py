@@ -8,6 +8,8 @@ import argparse
 import os
 from config import Config
 import sys
+
+
 class Preprocessor:
 
     def __init__(self, config):
@@ -40,6 +42,7 @@ class Preprocessor:
             t_audios = [self.mfcc(audio,self.config.samplerate, self.config.n_fft, self.config.hop_length) for audio in audios]
         elif mode == "spectro":
             t_audios = [self.spectrogram(audio,self.config.samplerate, self.config.n_fft, self.config.hop_length) for audio in audios]
+
         t_audios = np.stack(t_audios, axis=0)
         return t_audios
 
@@ -57,7 +60,7 @@ class Preprocessor:
             plt.savefig(fig_path)
             plt.close()
         elif mode=='mfcc':
-            librosa.display.specshow(data, sr=16000, x_axis='time')
+            librosa.display.specshow(data, x_axis='time')
             plt.savefig(fig_path)
             plt.close()
 
@@ -80,10 +83,13 @@ class Preprocessor:
         time_info = self.parsing_time_info(label_path)
 
         audio, sr = data
-        splited_audios = [audio[int(start*sr):int(end*sr)] for start, end in time_info]
-        splited_audios = [audio for audio in splited_audios if len(audio) >= self.config.drop_start_sec*self.config.samplerate and len(audio) <= self.config.drop_end_sec*self.config.samplerate]
-        splited_audios = [self.resize(audio, self.config.resize) for audio in splited_audios]
-        padded_audios = np.vstack(splited_audios)
+        try:
+            splited_audios = [audio[int(start*sr):int(end*sr)] for start, end in time_info]
+            splited_audios = [audio for audio in splited_audios if len(audio) >= self.config.drop_start_sec*self.config.samplerate and len(audio) <= self.config.drop_end_sec*self.config.samplerate]
+            splited_audios = [self.resize(audio, self.config.resize) for audio in splited_audios]
+            padded_audios = np.vstack(splited_audios)
+        except: raise Exception("Exception while audio preprocessing...")
+        
         return padded_audios
 
     def preprocessing(self, label_path, data_path, file_name, modes):
@@ -91,7 +97,12 @@ class Preprocessor:
             print("no mode")
             sys.exit(0)
         data = librosa.load(data_path, sr=16000)
-        padded_audios = self.audio_preprocess(label_path, data)
+
+        try:
+            padded_audios = self.audio_preprocess(label_path, data)
+        except Exception as e:
+            print(e)
+            return
 
         save_path = os.path.join(self.config.save_region_dir, file_name)
         if not os.path.isdir(save_path): os.mkdir(save_path)
@@ -174,7 +185,7 @@ def main():
     # 7. drop_start_sec
     # 8. drop_end_sec
     # 9. img_save : True면 이미지 저장
-    config = Config('../dataset', 'gangwon', 'gangwon_label', ['gangwon_data_1'], './preprocessed_gangwon', 16000, 4, 6, vis)
+    config = Config('../dataset', 'jeju', 'jeju_label', ['jeju_data_1'], './preprocessed_jeju', 16000, 4, 6, vis)
 
     preprocessor = Preprocessor(config)
 
