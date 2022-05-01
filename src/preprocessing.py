@@ -8,6 +8,8 @@ import argparse
 import os
 from config import Config
 import sys
+import multiprocessing as mp
+
 
 
 class Preprocessor:
@@ -50,6 +52,7 @@ class Preprocessor:
         if mode=='chroma':  
             librosa.display.specshow(data, x_axis='time', y_axis=mode)
             plt.savefig(fig_path)
+            plt.title("Chromagram")
             plt.close()
         elif mode=='spectro':
             librosa.display.specshow(data, sr= self.config.samplerate, hop_length=self.config.hop_length)
@@ -62,6 +65,7 @@ class Preprocessor:
         elif mode=='mfcc':
             librosa.display.specshow(data, x_axis='time')
             plt.savefig(fig_path)
+            plt.title("MFCC")
             plt.close()
 
     def savePickle(self, data, save_path):
@@ -89,11 +93,11 @@ class Preprocessor:
             splited_audios = [self.resize(audio, self.config.resize) for audio in splited_audios]
             padded_audios = np.vstack(splited_audios)
         except: raise Exception("Exception while audio preprocessing...")
-        
+
         return padded_audios
 
-    def preprocessing(self, label_path, data_path, file_name, modes):
-        if len(modes) == 0:
+    def preprocessing(self, label_path, data_path, file_name):
+        if len(self.config.modes) == 0:
             print("no mode")
             sys.exit(0)
         data = librosa.load(data_path, sr=16000)
@@ -107,7 +111,7 @@ class Preprocessor:
         save_path = os.path.join(self.config.save_region_dir, file_name)
         if not os.path.isdir(save_path): os.mkdir(save_path)
 
-        for mode in modes:
+        for mode in self.config.modes:
             preprocessed_audios = self.transform(padded_audios, mode)
             if self.config.img_save:
                 save_fig_path = os.path.join(save_path, f"{file_name}_{mode}.png")
@@ -115,7 +119,7 @@ class Preprocessor:
             save_pickle_path = os.path.join(save_path, f"{file_name}_{mode}.pickle")
             self.savePickle(preprocessed_audios, save_pickle_path)  
 
-    def run(self, modes):
+    def run(self):
 
         json_file_names = os.listdir(self.config.label_dir)
         json_file_names = [j for j in json_file_names if j.endswith('.json')]
@@ -140,14 +144,22 @@ class Preprocessor:
 
         if not os.path.isdir(self.config.save_region_dir): os.mkdir(self.config.save_region_dir)
 
-        for i, (label_file, data_file) in enumerate(wav_label_dict.items(),1):
-            print(f"\r{i}/{len(wav_label_dict)}", end="")
-            data_file_name, data_dir_name = data_file
-            label_path = os.path.join(self.config.label_dir, label_file)
-            data_path = os.path.join(self.config.region_dir, data_dir_name, data_file_name)
-            file_name = data_file_name[:-4]
-            self.preprocessing(label_path, data_path, file_name, modes)
+        cores = mp.cpu_count()
+        pool = mp.Pool(cores)
+        pool.map(self.p_run, list(wav_label_dict.items()))
+        pool.close()
+        pool.join()
+        
+    def p_run(self, data):
+        label_file, data_file = data
 
+        data_file_name, data_dir_name = data_file
+        label_path = os.path.join(self.config.label_dir, label_file)
+        data_path = os.path.join(self.config.region_dir, data_dir_name, data_file_name)
+        file_name = data_file_name[:-4]
+        print(file_name)
+        self.preprocessing(label_path, data_path, file_name)
+        return None
 
 def argparsing():
     parser = argparse.ArgumentParser(description='Parser for preprocess korean dialect audio data')
@@ -185,11 +197,12 @@ def main():
     # 7. drop_start_sec
     # 8. drop_end_sec
     # 9. img_save : True면 이미지 저장
-    config = Config('../dataset', 'jeju', 'jeju_label', ['jeju_data_1'], './preprocessed_jeju', 16000, 4, 6, vis)
+    # 10. modes: 적용할 transform 리스트
+    config = Config('../dataset', 'jeju', 'jeju_label', ['jeju_data_1'], './multi_test', 16000, 4, 6, vis, modes)
 
     preprocessor = Preprocessor(config)
 
-    preprocessor.run(modes)
+    preprocessor.run()
 
 if __name__ == '__main__':
     main()

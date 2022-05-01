@@ -1,7 +1,7 @@
 import os
 
 class Config:
-    def __init__(self, base_dir, region, label_dir_name, data_dir_names, save_region_dir, samplerate, drop_start_sec, drop_end_sec, img_save):
+    def __init__(self, base_dir, region, label_dir_name, data_dir_names, save_region_dir, samplerate, drop_start_sec, drop_end_sec, img_save, modes):
         self.base_dir = base_dir
         self.region = region
         self.region_dir = os.path.join(base_dir, region)
@@ -18,4 +18,5 @@ class Config:
         self.drop_end_sec = drop_end_sec
         self.resize = int((drop_start_sec + drop_end_sec) / 2 * samplerate)
         self.img_save = img_save
+        self.modes = modes
 
