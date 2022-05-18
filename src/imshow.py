@@ -1,22 +1,27 @@
 import librosa
 from matplotlib import pyplot  as plt
 import librosa.display
+
+
+class PlotAudio:
+
+    def __init__(self, y, sr):
+        self.y = y
+        self.sr = sr
+    
+    def waveshow(self):
+        librosa.display.waveshow(self.y, self.sr)
+        plt.close()
+
 def main():
     data_path = '../dataset/jeju/jeju_data_1/DZES20000002.wav'
 
     y, sr = librosa.load(data_path, offset=5, duration=3)
 
-    chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+    pla = PlotAudio(y, sr)
 
-    fig = plt.figure()
-    print("y shape : ",y.shape)
-    print("chroma shape :",chroma.shape)
-    print("sr : ",sr)
-
-    librosa.display.specshow(chroma, sr=sr)
-    fig.savefig('./chroma')
-
-
+    pla.waveshow()
+    
 
 if __name__ == '__main__':
     main()
